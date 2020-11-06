@@ -1,13 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body link="yellow" vlink="#00008b" alink="#ffd700" bgcolor="#87cefa">
     <H1> SHOW ALL EMPLOYEES PAGE</H1>
-
-    <br>
+    <br/>
+    <table>
+        <thead>
+        <tr>
+            <th> ID </th>
+            <th> Firstname </th>
+            <th> Surname </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="employee : ${employees}">
+            <td><span th:text="${employee.id}"> ID </span></td>
+            <td><span th:text="${employee.firstName}"> Firstname </span></td>
+            <td><span th:text="${employee.surName}"> Surname </span></td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
     <a href="/employee/"><H4> Go Back To Menu Page </H4></a>
 </body>
 </html>
