@@ -27,12 +27,14 @@ public class EmployeeController {
     }
 
     @GetMapping("/add")
-    public String add() {
+    public String addEmployeeForm(Model model) {
+        model.addAttribute("employee", new Employee());
         return "add";
     }
 
-    @PostMapping("/add_employee")
-    public String addEmployee(@RequestBody Employee employee, Model model) {
+    @PostMapping("/add")
+    public String addEmployee(@ModelAttribute Employee employee, Model model) {
+//        model.addAttribute("employee", employee);
         String wasAdded = "Error! Was not added!";
 
         employee.setFirstName(employee.getFirstName());
@@ -43,7 +45,7 @@ public class EmployeeController {
             employeeDao.add(employee);
 
             wasAdded = "Was Added Successfully";
-        } catch(Exception exception) {
+        } catch (Exception exception) {
             wasAdded = "There where an exception!";
         }
         model.addAttribute("wasAddedResult", wasAdded);
@@ -64,19 +66,21 @@ public class EmployeeController {
 
         model.addAttribute("id", employee.getId());
         model.addAttribute("firstName", employee.getFirstName());
-        model.addAttribute("surName", employee.getSurName ());
+        model.addAttribute("surName", employee.getSurName());
 
         return "show_employee";
-    }
-
-    @GetMapping("/delete/{employeeId}")
-    public String delete(@PathVariable("employeeId") String employeeId, Model model) {
-        model.addAttribute(employeeId);
-        return "delete";
     }
 
     @GetMapping("/delete")
     public String delete() {
         return "delete";
+    }
+
+    @GetMapping("/delete/{employeeId}")
+    public String deleteEmployee(@PathVariable("employeeId") String employeeId) {
+        EmployeeDao employeeDao = new EmployeeDao();
+        employeeDao.delete(Integer.parseInt(employeeId));
+
+        return "showall";
     }
 }

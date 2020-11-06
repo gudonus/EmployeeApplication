@@ -6,8 +6,11 @@
 </head>
 <body link="yellow" vlink="#00008b" alink="#ffd700" bgcolor="#87cefa">
     <H1> DELETE PAGE</H1>
-
-    <br>
+    <H3> Need to set employee ID... </H3>
+    <br/>
+    <input type="text" id="employeeId" name="employeeId" placeholder="1">
+    <button type="button" onclick="window.location.href = '/employee/delete/' + document.getElementById('employeeId').value + '/'"> Delete Employee </button>
+    <br/>
     <a href="/employee/"><H4> Go Back To Menu Page </H4></a>
 </body>
 </html>

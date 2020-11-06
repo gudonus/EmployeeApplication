@@ -2,25 +2,25 @@ package org.sbrf.employee;
 
 public class Employee {
 
-    private Integer id;
+    private long id;
 
     private String firstName;
 
     private String surName;
 
-    public Employee() {
-    }
+//    public Employee() {
+//    }
+//
+//    public Employee(String firstName, String surName) {
+//        this.firstName = firstName;
+//        this.surName = surName;
+//    }
 
-    public Employee(String firstName, String surName) {
-        this.firstName = firstName;
-        this.surName = surName;
-    }
-
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -10,5 +10,5 @@ public interface UserDao<T> {
 
     T getById(long employeeId) ; // подумать
 
-    void delete(T employee);
+    void delete(long employeeId);
 }
