@@ -9,7 +9,6 @@
     <H1> ADD PAGE</H1>
     <br/>
     <form action="#" th:action="@{/employee/add}" th:object="${employee}" method="post">
-<!--        <input type="text" th:field="*{id}" id="id" placeholder="0" disabled="disabled">-->
         <input type="text" th:field="*{firstName}" id="firstName" placeholder="Firstname">
         <input type="text" th:field="*{surName}" id="surName" placeholder="Surname">
         <br/><br/><br/>

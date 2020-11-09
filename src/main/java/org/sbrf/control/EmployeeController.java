@@ -1,5 +1,6 @@
 package org.sbrf.control;
 
+import org.apache.log4j.Logger;
 import org.sbrf.employee.Employee;
 import org.sbrf.employee.EmployeeDao;
 import org.springframework.stereotype.Controller;
@@ -14,16 +15,21 @@ public class EmployeeController {
 
     private EmployeeDao employeeDao;
 
+    private static final Logger logger = Logger.getLogger(EmployeeController.class);
+
     public EmployeeController() {
         try {
             this.employeeDao = new EmployeeDao();
         } catch (Exception exception) {
-            System.out.println("EmployeeDao creat error: " + exception.toString());
+            logger.error("EmployeeDao creat error: " + exception.toString());
         }
     }
 
     @GetMapping({"/", ""})
-    public String index() {
+    public String index(Model model) {
+        List<Employee> employees = employeeDao.getAll();
+        model.addAttribute("employees", employees);
+
         return "employee";
     }
 
@@ -52,6 +58,7 @@ public class EmployeeController {
         else
             wasAdded = "There where an exception!";
 
+        logger.info("\t addEmployee: " + wasAdded);
         model.addAttribute("wasAddedResult", wasAdded);
 
         return "add_employee";
@@ -84,6 +91,7 @@ public class EmployeeController {
     @GetMapping("/delete/{employeeId}")
     public String deleteEmployee(@PathVariable("employeeId") String employeeId, Model model) {
         employeeDao.delete(Integer.parseInt(employeeId));
+        logger.info("\t addEmployee: ");
 
         List<Employee> employees = employeeDao.getAll();
         model.addAttribute("employees", employees);

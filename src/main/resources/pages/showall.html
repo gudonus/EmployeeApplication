@@ -18,11 +18,12 @@
         </thead>
         <tbody>
         <tr th:each="employee : ${employees}">
-            <td><span th:text="${employee.id}"> ID </span></td> <!--th:field="*{firstName}"-->
-<!--            <td><input type="text" th:text="${employee.firstName}" id="firstName" placeholder="Firstname" disabled="disabled"></td>-->
+            <td><span th:text="${employee.id}"> ID </span></td>
             <td><span th:text="${employee.firstName}"> Firstname </span></td>
-<!--            <td><input type="text" th:text="${employee.surName}" id="surName" placeholder="Surname" disabled="disabled"></td>-->
             <td><span th:text="${employee.surName}"> Surname </span></td>
+
+            <td><a th:href="@{/employee/edit/__${employee.id}__/}"><input type="submit" value="/" th:href="@{/employee/edit/__${employee.id}__/}"/></a></td>
+            <td><a th:href="@{/employee/delete/__${employee.id}__/}"><input type="submit" value="x" th:href="@{/employee/delete/__${employee.id}__/}"/></a></td>
         </tr>
         </tbody>
     </table>

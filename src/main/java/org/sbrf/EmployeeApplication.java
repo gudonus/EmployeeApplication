@@ -1,36 +1,45 @@
 package org.sbrf;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import java.util.logging.Logger;
 
 public class EmployeeApplication {
 
-    private static final Logger logger = Logger.getLogger(String.valueOf(EmployeeApplication.class));
+    private static final Logger logger = Logger.getLogger(EmployeeApplication.class);
 
-    public static void main(String[] args) throws Exception {
-        System.out.println("Start EmployeeApplication...");
+    public static void main(String[] args) {
 
-//        org.apache.log4j.BasicConfigurator.configure(new NullAppender());
+        PropertyConfigurator.configure("src\\main\\resources\\log4j.properties");
 
+        try {
+            startServer(setHandler());
+        } catch (Exception exception) {
+            logger.error("On start application exception: " + exception);
+        }
+    }
+
+    private static ServletContextHandler setHandler() {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
         context.setConfigLocation("org.sbrf");
 
         ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         handler.addServlet(new ServletHolder(new DispatcherServlet(context)), "/");
 
+        return handler;
+    }
+
+    private static void startServer(ServletContextHandler handler) throws Exception {
         Server server = new Server(9999);
         server.setHandler(handler);
 
         server.start();
-//        System.out.println("Jetty server started!");
         logger.info("Jetty server started!");
         server.join();
-
-        System.out.println("Stopped EmployeeApplication.");
     }
 }

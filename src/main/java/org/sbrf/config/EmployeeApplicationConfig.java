@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
@@ -26,6 +27,7 @@ public class EmployeeApplicationConfig {
     }
 
     @Bean
+    @Scope("singleton")
     public SpringResourceTemplateResolver templateResolver() {
 
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
@@ -38,6 +40,7 @@ public class EmployeeApplicationConfig {
     }
 
     @Bean
+    @Scope("singleton")
     public SpringTemplateEngine templateEngine() {
 
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
@@ -48,6 +51,7 @@ public class EmployeeApplicationConfig {
     }
 
     @Bean
+    @Scope("singleton")
     public ViewResolver viewResolver() {
 
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();

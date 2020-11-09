@@ -1,9 +1,8 @@
 package org.sbrf.employee;
 
-import org.eclipse.jetty.server.handler.ContextHandler;
+import org.apache.log4j.Logger;
 import org.sbrf.dao.UserDao;
 import org.sbrf.db.DbConnectionManager;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,6 +15,8 @@ public class EmployeeDao implements UserDao<Employee> {
     static String DATABASE_PASS = "";
 
     private DbConnectionManager dbConnectionManager;
+
+    private Logger logger = Logger.getLogger(EmployeeDao.class);
 
     public EmployeeDao() throws SQLException, ClassNotFoundException {
         this.dbConnectionManager = new DbConnectionManager(
@@ -39,12 +40,12 @@ public class EmployeeDao implements UserDao<Employee> {
             employeeSet.next();
             resultMaxId = Integer.parseInt(employeeSet.getString("id"));
         } catch (Exception exception) {
-            System.out.println("On DB connect: " + exception.toString());
+            logger.error("\tgetMaxId: On DB connect: " + exception.toString());
         } finally {
             try {
                 statement.close();
             } catch (Exception exception) {
-                System.out.println("On DB close: " + exception.toString());
+                logger.error("\tgetMaxId: On DB close: " + exception.toString());
             }
         }
 
@@ -66,12 +67,12 @@ public class EmployeeDao implements UserDao<Employee> {
             if (preparedStatement.executeUpdate() != 1)
                 throw new Exception();
         } catch (Exception exception) {
-            System.out.println("On DB insert: " + exception.toString());
+            logger.error("\tadd: On DB insert: " + exception.toString());
         } finally {
             try {
                 preparedStatement.close();
             } catch (Exception exception) {
-                System.out.println("On DB insert close: " + exception.toString());
+                logger.error("\tadd: On DB insert close: " + exception.toString());
             }
         }
 
@@ -98,12 +99,12 @@ public class EmployeeDao implements UserDao<Employee> {
                 employees.add(employee);
             }
         } catch (Exception exception) {
-            System.out.println("On DB connect: " + exception.toString());
+            logger.error("\tgetAll: On DB connect: " + exception.toString());
         } finally {
             try {
                 statement.close();
             } catch (Exception exception) {
-                System.out.println("On DB close: " + exception.toString());
+                logger.error("\tgetAll:On DB close: " + exception.toString());
             }
         }
 
@@ -126,19 +127,19 @@ public class EmployeeDao implements UserDao<Employee> {
                 employee.setSurName(employeeSet.getString("surName"));
             }
         } catch (Exception exception) {
-            System.out.println("On DB connect: " + exception.toString());
+            logger.error("\tgetById: On DB connect: " + exception.toString());
         } finally {
             try {
                 statement.close();
             } catch (Exception exception) {
-                System.out.println("On DB close: " + exception.toString());
+                logger.error("getById: On DB close: " + exception.toString());
             }
         }
 
         return employee;
     }
 
-    public void delete(long employeeId) {
+    public Boolean delete(long employeeId) {
         PreparedStatement preparedStatement = null;
         Connection connection = dbConnectionManager.getConnection();
 
@@ -150,13 +151,15 @@ public class EmployeeDao implements UserDao<Employee> {
             if (preparedStatement.executeUpdate() != 1)
                 throw new Exception();
         } catch (Exception exception) {
-            System.out.println("On DB insert: " + exception.toString());
+            logger.error("\tdelete: On DB insert: " + exception.toString());
         } finally {
             try {
                 preparedStatement.close();
             } catch (Exception exception) {
-                System.out.println("On DB insert close: " + exception.toString());
+                logger.error("\tdelete: On DB insert close: " + exception.toString());
             }
         }
+
+        return true;
     }
 }
