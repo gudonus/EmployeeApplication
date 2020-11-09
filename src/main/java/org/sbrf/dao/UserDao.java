@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface UserDao<T> {
 
-    void add(T employee);
+    Boolean add(T employee);
 
     List<T> getAll();
 

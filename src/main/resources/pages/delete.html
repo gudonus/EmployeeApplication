@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -7,6 +8,26 @@
 <body link="yellow" vlink="#00008b" alink="#ffd700" bgcolor="#87cefa">
     <H1> DELETE PAGE</H1>
     <H3> Need to set employee ID... </H3>
+    <br/>
+    <table>
+        <thead>
+        <tr>
+            <th> ID </th>
+            <th> Firstname </th>
+            <th> Surname </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="employee : ${employees}">
+            <td><span th:text="${employee.id}"> ID </span></td> <!--th:field="*{firstName}"-->
+            <!--            <td><input type="text" th:text="${employee.firstName}" id="firstName" placeholder="Firstname" disabled="disabled"></td>-->
+            <td><span th:text="${employee.firstName}"> Firstname </span></td>
+            <!--            <td><input type="text" th:text="${employee.surName}" id="surName" placeholder="Surname" disabled="disabled"></td>-->
+            <td><span th:text="${employee.surName}"> Surname </span></td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
     <br/>
     <input type="text" id="employeeId" name="employeeId" placeholder="1">
     <button type="button" onclick="window.location.href = '/employee/delete/' + document.getElementById('employeeId').value + '/'"> Delete Employee </button>

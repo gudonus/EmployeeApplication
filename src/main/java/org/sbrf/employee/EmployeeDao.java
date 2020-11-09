@@ -2,6 +2,8 @@ package org.sbrf.employee;
 
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.sbrf.dao.UserDao;
+import org.sbrf.db.DbConnectionManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,15 +11,27 @@ import java.util.List;
 
 public class EmployeeDao implements UserDao<Employee> {
 
+    static String DATABASE_URL  = "jdbc:h2:file:C:\\Temp\\Projects\\EmployeeApp\\src\\main\\db\\employee";
+    static String DATABASE_USER = "";
+    static String DATABASE_PASS = "";
+
+    private DbConnectionManager dbConnectionManager;
+
+    public EmployeeDao() throws SQLException, ClassNotFoundException {
+        this.dbConnectionManager = new DbConnectionManager(
+                DATABASE_URL,
+                DATABASE_USER,
+                DATABASE_PASS
+        );
+    }
+
     private long getMaxId() {
         Statement statement = null;
         Connection connection = null;
         long resultMaxId = 0;
 
         try {
-            Class.forName("org.h2.Driver");
-
-            connection = DriverManager.getConnection("jdbc:h2:file:C:\\Temp\\Projects\\EmployeeApp\\src\\main\\db\\employee");
+            connection = dbConnectionManager.getConnection() ;//DriverManager.getConnection("jdbc:h2:file:C:\\Temp\\Projects\\EmployeeApp\\src\\main\\db\\employee");
             statement = connection.createStatement();
 
             String sqlQuery = "select max(id)+1 as id from employees ";
@@ -29,7 +43,6 @@ public class EmployeeDao implements UserDao<Employee> {
         } finally {
             try {
                 statement.close();
-                connection.close();
             } catch (Exception exception) {
                 System.out.println("On DB close: " + exception.toString());
             }
@@ -38,15 +51,11 @@ public class EmployeeDao implements UserDao<Employee> {
         return resultMaxId;
     }
 
-    public void add(Employee employee) {
+    public Boolean add(Employee employee) {
         PreparedStatement preparedStatement = null;
-        Connection connection = null;
+        Connection connection = dbConnectionManager.getConnection();
 
         try {
-            Class.forName("org.h2.Driver");
-
-            connection = DriverManager.getConnection("jdbc:h2:file:C:\\Temp\\Projects\\EmployeeApp\\src\\main\\db\\employee");
-
             String sqlQuery = "insert into Employees(ID, FirstName, SurName, StartDate, EndDate, FireDate, FunctionID, PersonDataID) " +
                     "values (?, ?, ?, sysdate, null, null, 1, 1);";
             preparedStatement = connection.prepareStatement(sqlQuery);
@@ -61,24 +70,21 @@ public class EmployeeDao implements UserDao<Employee> {
         } finally {
             try {
                 preparedStatement.close();
-                connection.close();
             } catch (Exception exception) {
                 System.out.println("On DB insert close: " + exception.toString());
             }
         }
+
+        return true;
     }
 
     public List getAll() {
         List<Employee> employees = new ArrayList<Employee>();
 
         Statement statement = null;
-        Connection connection = null;
+        Connection connection = dbConnectionManager.getConnection();
 
         try {
-            Class.forName("org.h2.Driver");
-
-            connection = DriverManager.getConnection("jdbc:h2:file:C:\\Temp\\Projects\\EmployeeApp\\src\\main\\db\\employee");
-
             statement = connection.createStatement();
             String sqlQuery = "select * from employees";
             ResultSet employeeSet = statement.executeQuery(sqlQuery);
@@ -96,7 +102,6 @@ public class EmployeeDao implements UserDao<Employee> {
         } finally {
             try {
                 statement.close();
-                connection.close();
             } catch (Exception exception) {
                 System.out.println("On DB close: " + exception.toString());
             }
@@ -107,14 +112,10 @@ public class EmployeeDao implements UserDao<Employee> {
 
     public Employee getById(long employeeId) {
         Statement statement = null;
-        Connection connection = null;
+        Connection connection = dbConnectionManager.getConnection();
 
         Employee employee = new Employee();
         try {
-            Class.forName("org.h2.Driver");
-
-            connection = DriverManager.getConnection("jdbc:h2:file:C:\\Temp\\Projects\\EmployeeApp\\src\\main\\db\\employee");
-
             statement = connection.createStatement();
             String sqlQuery = "select * from employees where ID = " + String.valueOf(employeeId);
             ResultSet employeeSet = statement.executeQuery(sqlQuery);
@@ -129,7 +130,6 @@ public class EmployeeDao implements UserDao<Employee> {
         } finally {
             try {
                 statement.close();
-                connection.close();
             } catch (Exception exception) {
                 System.out.println("On DB close: " + exception.toString());
             }
@@ -140,13 +140,9 @@ public class EmployeeDao implements UserDao<Employee> {
 
     public void delete(long employeeId) {
         PreparedStatement preparedStatement = null;
-        Connection connection = null;
+        Connection connection = dbConnectionManager.getConnection();
 
         try {
-            Class.forName("org.h2.Driver");
-
-            connection = DriverManager.getConnection("jdbc:h2:file:C:\\Temp\\Projects\\EmployeeApp\\src\\main\\db\\employee");
-
             String sqlQuery = "delete from Employees where id = ?";
             preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setString(1, String.valueOf(employeeId));
@@ -158,7 +154,6 @@ public class EmployeeDao implements UserDao<Employee> {
         } finally {
             try {
                 preparedStatement.close();
-                connection.close();
             } catch (Exception exception) {
                 System.out.println("On DB insert close: " + exception.toString());
             }

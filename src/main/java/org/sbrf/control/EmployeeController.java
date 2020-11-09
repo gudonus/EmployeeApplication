@@ -12,6 +12,16 @@ import java.util.List;
 @RequestMapping("/employee")
 public class EmployeeController {
 
+    private EmployeeDao employeeDao;
+
+    public EmployeeController() {
+        try {
+            this.employeeDao = new EmployeeDao();
+        } catch (Exception exception) {
+            System.out.println("EmployeeDao creat error: " + exception.toString());
+        }
+    }
+
     @GetMapping({"/", ""})
     public String index() {
         return "employee";
@@ -19,10 +29,9 @@ public class EmployeeController {
 
     @GetMapping("/showall")
     public String showAll(Model model) {
-        EmployeeDao employeeDao = new EmployeeDao();
         List<Employee> employees = employeeDao.getAll();
-
         model.addAttribute("employees", employees);
+
         return "showall";
     }
 
@@ -34,20 +43,15 @@ public class EmployeeController {
 
     @PostMapping("/add")
     public String addEmployee(@ModelAttribute Employee employee, Model model) {
-//        model.addAttribute("employee", employee);
-        String wasAdded = "Error! Was not added!";
-
         employee.setFirstName(employee.getFirstName());
         employee.setSurName(employee.getSurName());
 
-        try {
-            EmployeeDao employeeDao = new EmployeeDao();
-            employeeDao.add(employee);
-
+        String wasAdded;
+        if (employeeDao.add(employee))
             wasAdded = "Was Added Successfully";
-        } catch (Exception exception) {
+        else
             wasAdded = "There where an exception!";
-        }
+
         model.addAttribute("wasAddedResult", wasAdded);
 
         return "add_employee";
@@ -60,8 +64,6 @@ public class EmployeeController {
 
     @GetMapping("/show/{employeeId}")
     public String show(@PathVariable("employeeId") String employeeId, Model model) {
-
-        EmployeeDao employeeDao = new EmployeeDao();
         Employee employee = employeeDao.getById(Integer.parseInt(employeeId));
 
         model.addAttribute("id", employee.getId());
@@ -72,14 +74,19 @@ public class EmployeeController {
     }
 
     @GetMapping("/delete")
-    public String delete() {
+    public String delete(Model model) {
+        List<Employee> employees = employeeDao.getAll();
+        model.addAttribute("employees", employees);
+
         return "delete";
     }
 
     @GetMapping("/delete/{employeeId}")
-    public String deleteEmployee(@PathVariable("employeeId") String employeeId) {
-        EmployeeDao employeeDao = new EmployeeDao();
+    public String deleteEmployee(@PathVariable("employeeId") String employeeId, Model model) {
         employeeDao.delete(Integer.parseInt(employeeId));
+
+        List<Employee> employees = employeeDao.getAll();
+        model.addAttribute("employees", employees);
 
         return "showall";
     }
