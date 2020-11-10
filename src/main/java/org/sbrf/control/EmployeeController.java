@@ -1,8 +1,10 @@
 package org.sbrf.control;
 
 import org.apache.log4j.Logger;
+import org.sbrf.dao.EmployeeDao;
+import org.sbrf.dao.FunctionDao;
 import org.sbrf.employee.Employee;
-import org.sbrf.employee.EmployeeDao;
+import org.sbrf.employee.Function;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +15,18 @@ import java.util.List;
 @RequestMapping("/employee")
 public class EmployeeController {
 
+    private static final Logger logger = Logger.getLogger(EmployeeController.class);
+
     private EmployeeDao employeeDao;
 
-    private static final Logger logger = Logger.getLogger(EmployeeController.class);
+    private FunctionDao functionDao;
 
     public EmployeeController() {
         try {
             this.employeeDao = new EmployeeDao();
+            this.functionDao = new FunctionDao();
         } catch (Exception exception) {
-            logger.error("EmployeeDao creat error: " + exception.toString());
+            logger.error("EmployeeController in create error: " + exception.toString());
         }
     }
 
@@ -44,19 +49,22 @@ public class EmployeeController {
     @GetMapping("/add")
     public String addEmployeeForm(Model model) {
         model.addAttribute("employee", new Employee());
+
+        List<Function> functions = functionDao.getAll();
+        model.addAttribute("functions", functions);
+
         return "add";
     }
 
     @PostMapping("/add")
     public String addEmployee(@ModelAttribute Employee employee, Model model) {
-        employee.setFirstName(employee.getFirstName());
-        employee.setSurName(employee.getSurName());
-
         String wasAdded;
-        if (employeeDao.add(employee))
+        try {
+            employeeDao.add(employee);
             wasAdded = "Was Added Successfully";
-        else
-            wasAdded = "There where an exception!";
+        } catch(Exception exception) {
+            wasAdded = "Error adding employee: " + exception.toString();
+        }
 
         logger.info("\t addEmployee: " + wasAdded);
         model.addAttribute("wasAddedResult", wasAdded);
@@ -71,7 +79,7 @@ public class EmployeeController {
 
     @GetMapping("/show/{employeeId}")
     public String show(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeDao.getById(Integer.parseInt(employeeId));
+        Employee employee = employeeDao.get(Integer.parseInt(employeeId));
 
         model.addAttribute("id", employee.getId());
         model.addAttribute("firstName", employee.getFirstName());

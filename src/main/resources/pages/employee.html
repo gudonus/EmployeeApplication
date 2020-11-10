@@ -8,12 +8,15 @@
 <body link="yellow" vlink="#00008b" alink="#ffd700" bgcolor="#87cefa">
 <br>
     <H1> EMPLOYEE PAGE </H1>
-    <table>
+    <table border="1" bgcolor="#000000">
         <thead>
         <tr>
             <th> ID </th>
             <th> Firstname </th>
             <th> Surname </th>
+            <th> Function </th>
+            <th> Address </th>
+            <th> Phone </th>
         </tr>
         </thead>
         <tbody>
@@ -21,6 +24,9 @@
             <td><span th:text="${employee.id}"> ID </span></td>
             <td><span th:text="${employee.firstName}"> Firstname </span></td>
             <td><span th:text="${employee.surName}"> Surname </span></td>
+            <td><span th:text="${employee.function}"> Function </span></td>
+            <td><span th:text="${employee.address}"> Address </span></td>
+            <td><span th:text="${employee.phone}"> Phone </span></td>
 
             <td><a th:href="@{/employee/edit/__${employee.id}__/}"><input type="submit" value="/" th:href="@{/employee/edit/__${employee.id}__/}"/></a></td>
             <td><a th:href="@{/employee/delete/__${employee.id}__/}"><input type="submit" value="x" th:href="@{/employee/delete/__${employee.id}__/}"/></a></td>
@@ -30,6 +36,8 @@
     <br>
     <br>
     <a href="/employee/add/"><H4> Add New Employee </H4></a>
+    <a href="/employee/function/"><H4> Add New Function </H4></a>
+    <br/>
     <a href="/employee/show/"><H4> Show Employee By ID </H4></a>
     <a href="/employee/showall/"><H4> Show All Employees </H4></a>
     <a href="/employee/delete/"><H4> Delete Employee By ID </H4></a>

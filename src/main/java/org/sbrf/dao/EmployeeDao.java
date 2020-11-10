@@ -1,93 +1,109 @@
-package org.sbrf.employee;
+package org.sbrf.dao;
 
 import org.apache.log4j.Logger;
-import org.sbrf.dao.UserDao;
 import org.sbrf.db.DbConnectionManager;
+import org.sbrf.employee.Employee;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmployeeDao implements UserDao<Employee> {
-
-    static String DATABASE_URL  = "jdbc:h2:file:C:\\Temp\\Projects\\EmployeeApp\\src\\main\\db\\employee";
-    static String DATABASE_USER = "";
-    static String DATABASE_PASS = "";
+public class EmployeeDao implements Dao<Employee> {
 
     private DbConnectionManager dbConnectionManager;
 
     private Logger logger = Logger.getLogger(EmployeeDao.class);
 
     public EmployeeDao() throws SQLException, ClassNotFoundException {
+
         this.dbConnectionManager = new DbConnectionManager(
-                DATABASE_URL,
-                DATABASE_USER,
-                DATABASE_PASS
+                DbConnectionManager.DATABASE_URL,
+                DbConnectionManager.DATABASE_USER,
+                DbConnectionManager.DATABASE_PASS
         );
     }
 
-    private long getMaxId() {
-        Statement statement = null;
-        Connection connection = null;
-        long resultMaxId = 0;
-
+    private long getMaxId(String tableName) {
+        long resultMaxId = 1;
         try {
-            connection = dbConnectionManager.getConnection() ;//DriverManager.getConnection("jdbc:h2:file:C:\\Temp\\Projects\\EmployeeApp\\src\\main\\db\\employee");
-            statement = connection.createStatement();
+            Connection connection = dbConnectionManager.getConnection();
+            Statement statement = connection.createStatement();
 
-            String sqlQuery = "select max(id)+1 as id from employees ";
+            String sqlQuery = "select nvl(max(id),0)+1 as id from " + tableName;
             ResultSet employeeSet = statement.executeQuery(sqlQuery);
             employeeSet.next();
             resultMaxId = Integer.parseInt(employeeSet.getString("id"));
+
+            statement.close();
         } catch (Exception exception) {
             logger.error("\tgetMaxId: On DB connect: " + exception.toString());
-        } finally {
-            try {
-                statement.close();
-            } catch (Exception exception) {
-                logger.error("\tgetMaxId: On DB close: " + exception.toString());
-            }
         }
 
         return resultMaxId;
     }
 
-    public Boolean add(Employee employee) {
-        PreparedStatement preparedStatement = null;
+    public Boolean add(Employee employee) throws Exception {
         Connection connection = dbConnectionManager.getConnection();
 
+        if (employee.isNull()) throw new Exception("No data to add to Employee!");
         try {
+            Long PersonDataId = createPersonData(employee);
+
             String sqlQuery = "insert into Employees(ID, FirstName, SurName, StartDate, EndDate, FireDate, FunctionID, PersonDataID) " +
-                    "values (?, ?, ?, sysdate, null, null, 1, 1);";
-            preparedStatement = connection.prepareStatement(sqlQuery);
-            preparedStatement.setString(1, String.valueOf(getMaxId()));
+                    "values (?, ?, ?, sysdate, null, null, ?, ?);";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setString(1, String.valueOf(getMaxId("employees")));
             preparedStatement.setString(2, employee.getFirstName());
             preparedStatement.setString(3, employee.getSurName());
+            preparedStatement.setString(4, employee.getFunction());
+            preparedStatement.setString(5, String.valueOf(PersonDataId));
 
             if (preparedStatement.executeUpdate() != 1)
                 throw new Exception();
+
+            preparedStatement.close();
         } catch (Exception exception) {
             logger.error("\tadd: On DB insert: " + exception.toString());
-        } finally {
-            try {
-                preparedStatement.close();
-            } catch (Exception exception) {
-                logger.error("\tadd: On DB insert close: " + exception.toString());
-            }
         }
 
         return true;
     }
 
+    private Long createPersonData(Employee employee) {
+        Connection connection = dbConnectionManager.getConnection();
+
+        Long PersonDataId = getMaxId("PersonDatas");
+        try {
+
+            String sqlQuery = "insert into PersonDatas(ID, EmployeeID, DataDate, Phone, Address) " +
+                    "values (?, ?, sysdate, ?, ?);";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, String.valueOf(PersonDataId));
+            preparedStatement.setString(2, String.valueOf(employee.getId()));
+            preparedStatement.setString(3, employee.getPhone());
+            preparedStatement.setString(4, employee.getAddress());
+
+            if (preparedStatement.executeUpdate() != 1)
+                throw new Exception();
+
+            preparedStatement.close();
+        } catch (Exception exception) {
+            logger.error("\tadd: On DB insert: " + exception.toString());
+        }
+
+        return PersonDataId;
+    }
+
     public List getAll() {
         List<Employee> employees = new ArrayList<Employee>();
 
-        Statement statement = null;
         Connection connection = dbConnectionManager.getConnection();
-
         try {
-            statement = connection.createStatement();
-            String sqlQuery = "select * from employees";
+            Statement statement = connection.createStatement();
+            String sqlQuery = "select emp.ID, emp.FirstName, emp.SurName, func.Name as function, pd.Address, pd.Phone\n" +
+                               " from Employees emp\n" +
+                               " left join Functions func on func.ID = emp.FunctionID\n" +
+                               " left join PersonDatas pd on pd.ID = emp.PersonDataID\n";
             ResultSet employeeSet = statement.executeQuery(sqlQuery);
 
             while (employeeSet.next()) {
@@ -95,29 +111,26 @@ public class EmployeeDao implements UserDao<Employee> {
                 employee.setId(Integer.parseInt(employeeSet.getString("id")));
                 employee.setFirstName(employeeSet.getString("firstName"));
                 employee.setSurName(employeeSet.getString("surName"));
-
+                employee.setFunction(employeeSet.getString("function"));
+                employee.setAddress(employeeSet.getString("address"));
+                employee.setPhone(employeeSet.getString("phone"));
                 employees.add(employee);
+
             }
+            statement.close();
         } catch (Exception exception) {
             logger.error("\tgetAll: On DB connect: " + exception.toString());
-        } finally {
-            try {
-                statement.close();
-            } catch (Exception exception) {
-                logger.error("\tgetAll:On DB close: " + exception.toString());
-            }
         }
 
         return employees;
     }
 
-    public Employee getById(long employeeId) {
-        Statement statement = null;
+    public Employee get(long employeeId) {
         Connection connection = dbConnectionManager.getConnection();
 
         Employee employee = new Employee();
         try {
-            statement = connection.createStatement();
+            Statement statement = connection.createStatement();
             String sqlQuery = "select * from employees where ID = " + String.valueOf(employeeId);
             ResultSet employeeSet = statement.executeQuery(sqlQuery);
 
@@ -126,38 +139,28 @@ public class EmployeeDao implements UserDao<Employee> {
                 employee.setFirstName(employeeSet.getString("firstName"));
                 employee.setSurName(employeeSet.getString("surName"));
             }
+            statement.close();
         } catch (Exception exception) {
-            logger.error("\tgetById: On DB connect: " + exception.toString());
-        } finally {
-            try {
-                statement.close();
-            } catch (Exception exception) {
-                logger.error("getById: On DB close: " + exception.toString());
-            }
+            logger.error("\tget: On DB connect: " + exception.toString());
         }
 
         return employee;
     }
 
     public Boolean delete(long employeeId) {
-        PreparedStatement preparedStatement = null;
         Connection connection = dbConnectionManager.getConnection();
-
         try {
             String sqlQuery = "delete from Employees where id = ?";
-            preparedStatement = connection.prepareStatement(sqlQuery);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setString(1, String.valueOf(employeeId));
 
             if (preparedStatement.executeUpdate() != 1)
                 throw new Exception();
+
+            preparedStatement.close();
         } catch (Exception exception) {
             logger.error("\tdelete: On DB insert: " + exception.toString());
-        } finally {
-            try {
-                preparedStatement.close();
-            } catch (Exception exception) {
-                logger.error("\tdelete: On DB insert close: " + exception.toString());
-            }
         }
 
         return true;

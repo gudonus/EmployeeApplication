@@ -1,12 +1,51 @@
 package org.sbrf.employee;
 
-public class Employee {
+import java.io.Serializable;
+
+public class Employee implements Serializable {
 
     private long id;
 
     private String firstName;
 
     private String surName;
+
+    private String function;
+
+    private String address;
+
+    private String phone;
+
+    public boolean isNull() {
+        if(firstName.isEmpty() && surName.isEmpty())
+            return true;
+
+        return false;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getFunction() {
+        return function;
+    }
+
+    public void setFunction(String function) {
+        this.function = function;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
 //    public Employee() {
 //    }

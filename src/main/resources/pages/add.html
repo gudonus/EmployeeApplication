@@ -9,8 +9,19 @@
     <H1> ADD PAGE</H1>
     <br/>
     <form action="#" th:action="@{/employee/add}" th:object="${employee}" method="post">
-        <input type="text" th:field="*{firstName}" id="firstName" placeholder="Firstname">
-        <input type="text" th:field="*{surName}" id="surName" placeholder="Surname">
+        <input type="text" size="25" th:field="*{firstName}" id="firstName" placeholder="Firstname">
+        <input type="text" size="25" th:field="*{surName}" id="surName" placeholder="Surname">
+        <br>
+        <select th:field="*{function}" id="function">
+            <option th:each="functionItem : ${functions}" th:value="${functionItem.id}" th:text="${functionItem.name}">
+                Function
+            </option>
+        </select>
+        <br>
+        <input type="text"  size="50" th:field="*{address}" id="address" placeholder="Address">
+        <br>
+        <input type="text" size="50" th:field="*{phone}" id="phone" placeholder="Phone">
+
         <br/><br/><br/>
         <input type="submit" value="Add Employee"/> <input type="reset" value="Reset"/>
     </form>
