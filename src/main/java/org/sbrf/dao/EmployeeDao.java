@@ -101,9 +101,9 @@ public class EmployeeDao implements Dao<Employee> {
         try {
             Statement statement = connection.createStatement();
             String sqlQuery = "select emp.ID, emp.FirstName, emp.SurName, func.Name as function, pd.Address, pd.Phone\n" +
-                               " from Employees emp\n" +
-                               " left join Functions func on func.ID = emp.FunctionID\n" +
-                               " left join PersonDatas pd on pd.ID = emp.PersonDataID\n";
+                    " from Employees emp\n" +
+                    " left join Functions func on func.ID = emp.FunctionID\n" +
+                    " left join PersonDatas pd on pd.ID = emp.PersonDataID\n";
             ResultSet employeeSet = statement.executeQuery(sqlQuery);
 
             while (employeeSet.next()) {
