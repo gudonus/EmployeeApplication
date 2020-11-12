@@ -1,6 +1,7 @@
 package org.sbrf.control;
 
 import org.apache.log4j.Logger;
+import org.sbrf.StoreTypes;
 import org.sbrf.dao.DbObjectDao;
 import org.sbrf.dao.MemoryObjectDao;
 import org.sbrf.dao.ObjectDao;
@@ -19,22 +20,25 @@ public class EmployeeController {
 
     private static final Logger logger = Logger.getLogger(EmployeeController.class);
 
-    private ObjectDao dbDao;
+    public static StoreTypes baseStoreType;
 
-    public EmployeeController() {
+    private static ObjectDao employeeDao;
+
+    public static void createDao() {
         try {
-//            dbDao = new DbObjectDao();
-            dbDao = new MemoryObjectDao();
+            if (baseStoreType == StoreTypes.Database)
+                employeeDao = new DbObjectDao();
+            else
+                employeeDao = new MemoryObjectDao();
         } catch (Exception exception) {
             logger.error("EmployeeController in create error: " + exception.toString());
             exception.printStackTrace();
         }
     }
-
     @GetMapping({"/", ""})
     public String index(Model model) {
         try {
-            List<Employee> employees = dbDao.getAll();
+            List<Employee> employees = employeeDao.getAll();
             model.addAttribute("employees", employees);
         } catch(GetAllObjectException exception) {
             logger.error("EmployeeController in getAll error: " + exception.toString());
@@ -47,7 +51,7 @@ public class EmployeeController {
     @GetMapping("/showall")
     public String showAll(Model model) {
         try {
-            List<Employee> employees = dbDao.getAll();
+            List<Employee> employees = employeeDao.getAll();
             model.addAttribute("employees", employees);
         } catch(GetAllObjectException exception) {
             logger.error("EmployeeController cannot shawall: " + exception.toString());
@@ -62,7 +66,7 @@ public class EmployeeController {
         model.addAttribute("employee", new Employee());
 
         try {
-            List<Function> functions = dbDao.getAllFunctions();
+            List<Function> functions = employeeDao.getAllFunctions();
             model.addAttribute("functions", functions);
         } catch (GetAllFunctionObjectException exception) {
             logger.error("EmployeeController cannot add: " + exception.toString());
@@ -73,10 +77,10 @@ public class EmployeeController {
 
     @GetMapping("/update/{employeeId}")
     public String update(@PathVariable("employeeId") String employeeId, Model model) {
-        model.addAttribute("employee", dbDao.get(Long.parseLong(employeeId)));
+        model.addAttribute("employee", employeeDao.get(Long.parseLong(employeeId)));
 
         try {
-            List<Function> functions = dbDao.getAllFunctions();
+            List<Function> functions = employeeDao.getAllFunctions();
             model.addAttribute("functions", functions);
         } catch (GetAllFunctionObjectException exception) {
             logger.error("EmployeeController cannot update: " + exception.toString());
@@ -89,7 +93,7 @@ public class EmployeeController {
     public String addEmployee(@ModelAttribute Employee employee, Model model) {
         String wasAdded;
         try {
-            dbDao.add(employee);
+            employeeDao.add(employee);
             wasAdded = "Was Added Successfully";
         } catch (CannotAddObjectException exception) {
             wasAdded = "Error adding employee: " + exception.toString();
@@ -106,7 +110,7 @@ public class EmployeeController {
     public String updateEmployee(@ModelAttribute Employee employee, Model model) {
         String wasUpdated;
         try {
-            dbDao.update(employee);
+            employeeDao.update(employee);
             wasUpdated = "Was Added Successfully";
         } catch (CannotUpdateObjectException exception) {
             wasUpdated = "Error adding employee: " + exception.toString();
@@ -126,7 +130,7 @@ public class EmployeeController {
 
     @GetMapping("/show/{employeeId}")
     public String show(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = dbDao.get(Integer.parseInt(employeeId));
+        Employee employee = employeeDao.get(Integer.parseInt(employeeId));
 
         model.addAttribute("id", employee.getId());
         model.addAttribute("firstName", employee.getFirstName());
@@ -140,7 +144,7 @@ public class EmployeeController {
     @GetMapping("/delete")
     public String delete(Model model) {
         try {
-            List<Employee> employees = dbDao.getAll();
+            List<Employee> employees = employeeDao.getAll();
             model.addAttribute("employees", employees);
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -152,7 +156,7 @@ public class EmployeeController {
     @GetMapping("/delete/{employeeId}")
     public String deleteEmployee(@PathVariable("employeeId") String employeeId, Model model) {
         try {
-            dbDao.delete(Integer.parseInt(employeeId));
+            employeeDao.delete(Integer.parseInt(employeeId));
         } catch (CannotDeleteObjectException exception) {
             exception.printStackTrace();
             logger.error("EmployeeController cannot delete: " + exception.toString());
@@ -160,7 +164,7 @@ public class EmployeeController {
         logger.info("\t Employee was deleted!");
 
         try {
-            List<Employee> employees = dbDao.getAll();
+            List<Employee> employees = employeeDao.getAll();
             model.addAttribute("employees", employees);
         } catch(GetAllObjectException exception) {
             exception.printStackTrace();

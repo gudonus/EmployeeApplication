@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="WIN-1251">
     <title>Title</title>
@@ -9,6 +10,8 @@
     <H1> MAIN PAGE </H1>
     <br>
     <a href="employee"><H3> Employee Directory </H3></a>
-
+    <br>
+    <a th:href="@{/1/}"><input type="submit" value="Database" th:href="@{/1/}"/></a>
+    <a th:href="@{/2/}"><input type="submit" value="Memory" th:href="@{/2/}"/></a>
 </body>
 </html>
