@@ -1,15 +1,21 @@
 package org.sbrf.dao;
 
-import java.sql.SQLException;
+import org.sbrf.exception.CannotAddObjectException;
+import org.sbrf.exception.CannotDeleteObjectException;
+import org.sbrf.exception.CannotUpdateObjectException;
+import org.sbrf.exception.GetAllObjectException;
+
 import java.util.List;
 
+// реализовать на основе мап - хранение в памяти
 public interface Dao<T> {
 
-    Boolean add(T object) throws Exception;
+    void add(T object) throws CannotAddObjectException;
 
-    List<T> getAll() throws SQLException;
+    List<T> getAll() throws GetAllObjectException;
+    T get(long objectId); // фильтр-интерфейс реализован для объекта ...
 
-    T get(long objectId);
+    void delete(long objectId) throws CannotDeleteObjectException;
 
-    Boolean delete(long objectId);
+    void update(T object) throws CannotUpdateObjectException;
 }

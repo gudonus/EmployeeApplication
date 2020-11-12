@@ -1,4 +1,4 @@
-package org.sbrf.employee;
+package org.sbrf.dto;
 
 import java.io.Serializable;
 
@@ -16,11 +16,11 @@ public class Employee implements Serializable {
 
     private String phone;
 
-    public boolean isNull() {
-        if(firstName.isEmpty() && surName.isEmpty())
-            return true;
+    public boolean isValid() {
+        if (firstName.isEmpty() && surName.isEmpty())
+            return false;
 
-        return false;
+        return true;
     }
 
     public String getAddress() {

@@ -28,7 +28,7 @@
             <td><span th:text="${employee.address}"> Address </span></td>
             <td><span th:text="${employee.phone}"> Phone </span></td>
 
-            <td><a th:href="@{/employee/edit/__${employee.id}__/}"><input type="submit" value="/" th:href="@{/employee/edit/__${employee.id}__/}"/></a></td>
+            <td><a th:href="@{/employee/update/__${employee.id}__/}"><input type="submit" value="/" th:href="@{/employee/update/__${employee.id}__/}"/></a></td>
             <td><a th:href="@{/employee/delete/__${employee.id}__/}"><input type="submit" value="x" th:href="@{/employee/delete/__${employee.id}__/}"/></a></td>
         </tr>
         </tbody>

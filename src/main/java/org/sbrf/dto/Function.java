@@ -1,4 +1,4 @@
-package org.sbrf.employee;
+package org.sbrf.dto;
 
 import java.io.Serializable;
 
