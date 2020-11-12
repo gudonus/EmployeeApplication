@@ -28,13 +28,12 @@ public class DbObjectDao implements ObjectDao {
         );
     }
 
-    // hashCode...
     @Override
     public void add(Employee employee) throws CannotAddObjectException {
         Connection connection = dbConnectionManager.getConnection();
 
         if (!employee.isValid())
-            throw new CannotAddObjectException("Not all fields were completed!");
+            throw new CannotAddObjectException("DbObjectDao: Not all fields were completed!");
 
         try {
             Long PersonDataId = createPersonData(employee);
@@ -49,12 +48,12 @@ public class DbObjectDao implements ObjectDao {
             preparedStatement.setString(5, String.valueOf(PersonDataId));
 
             if (preparedStatement.executeUpdate() != 1)
-                throw new CannotAddObjectException("Was not added employee in the DataBase!");
+                throw new CannotAddObjectException("DbObjectDao: Was not added employee in the DataBase!");
 
             preparedStatement.close();
         } catch (Exception exception) {
-            logger.error("\tupdate: On DB insert: " + exception.toString());
-            throw new CannotAddObjectException("Database exception during updating the employee! " + exception.toString());
+            logger.error("\tDbObjectDao: update: On DB insert: " + exception.toString());
+            throw new CannotAddObjectException("DbObjectDao: Database exception during updating the employee! " + exception.toString());
         }
     }
 
@@ -63,7 +62,7 @@ public class DbObjectDao implements ObjectDao {
         Connection connection = dbConnectionManager.getConnection();
 
         if (!employee.isValid())
-            throw new CannotUpdateObjectException("Not all fields were completed!");
+            throw new CannotUpdateObjectException("DbObjectDao: Not all fields were completed!");
 
         try {
             Long PersonDataId = createPersonData(employee);
@@ -78,12 +77,12 @@ public class DbObjectDao implements ObjectDao {
             preparedStatement.setString(4, String.valueOf(PersonDataId));
 
             if (preparedStatement.executeUpdate() != 1)
-                throw new CannotUpdateObjectException("Was not updated employee into the DataBase!");
+                throw new CannotUpdateObjectException("DbObjectDao: Was not updated employee into the DataBase!");
 
             preparedStatement.close();
         } catch (Exception exception) {
-            logger.error("\tupdate: On DB insert: " + exception.toString());
-            throw new CannotUpdateObjectException("Database exception during updating the employee! " + exception.toString());
+            logger.error("\tDbObjectDao: update: On DB insert: " + exception.toString());
+            throw new CannotUpdateObjectException("DbObjectDao: Database exception during updating the employee! " + exception.toString());
         }
     }
 
@@ -113,7 +112,7 @@ public class DbObjectDao implements ObjectDao {
             }
             statement.close();
         } catch (Exception exception) {
-            logger.error("\tgetAll: On DB connect: " + exception.toString());
+            logger.error("\tDbObjectDao: getAll: On DB connect: " + exception.toString());
         }
 
         return employees;
@@ -137,7 +136,7 @@ public class DbObjectDao implements ObjectDao {
             }
             statement.close();
         } catch (SQLException exception) {
-            throw new GetAllFunctionObjectException("getAll: " + exception.toString());
+            throw new GetAllFunctionObjectException("DbObjectDao: getAll: " + exception.toString());
         }
 
         return functions;
@@ -167,7 +166,7 @@ public class DbObjectDao implements ObjectDao {
             }
             statement.close();
         } catch (Exception exception) {
-            logger.error("\tget: On DB connect: " + exception.toString());
+            logger.error("\tDbObjectDao: get: On DB connect: " + exception.toString());
         }
 
         return employee;
@@ -185,8 +184,8 @@ public class DbObjectDao implements ObjectDao {
 
             preparedStatement.close();
         } catch (Exception exception) {
-            logger.error("\tdelete: On DB insert: " + exception.toString());
-            throw new CannotDeleteObjectException("DbDao->delete: " + exception.getMessage());
+            logger.error("\tDbObjectDao: delete: On DB insert: " + exception.toString());
+            throw new CannotDeleteObjectException("DbObjectDao: delete: " + exception.getMessage());
         }
     }
 
@@ -209,7 +208,7 @@ public class DbObjectDao implements ObjectDao {
 
             preparedStatement.close();
         } catch (Exception exception) {
-            logger.error("\tadd: On DB insert: " + exception.toString());
+            logger.error("\tDbObjectDao: add: On DB insert: " + exception.toString());
         }
 
         return PersonDataId;

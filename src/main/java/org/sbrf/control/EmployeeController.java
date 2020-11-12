@@ -2,6 +2,7 @@ package org.sbrf.control;
 
 import org.apache.log4j.Logger;
 import org.sbrf.dao.DbObjectDao;
+import org.sbrf.dao.MemoryObjectDao;
 import org.sbrf.dao.ObjectDao;
 import org.sbrf.dto.Employee;
 import org.sbrf.dto.Function;
@@ -22,7 +23,8 @@ public class EmployeeController {
 
     public EmployeeController() {
         try {
-            dbDao = new DbObjectDao();
+//            dbDao = new DbObjectDao();
+            dbDao = new MemoryObjectDao();
         } catch (Exception exception) {
             logger.error("EmployeeController in create error: " + exception.toString());
             exception.printStackTrace();

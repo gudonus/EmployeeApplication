@@ -11,6 +11,14 @@ public class Function implements Serializable {
         return id;
     }
 
+    public Function() {
+    }
+
+    public Function(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
