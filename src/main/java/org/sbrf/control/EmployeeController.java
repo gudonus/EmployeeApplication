@@ -1,7 +1,7 @@
 package org.sbrf.control;
 
 import org.apache.log4j.Logger;
-import org.sbrf.StoreTypes;
+import org.sbrf.enums.StoreTypes;
 import org.sbrf.dao.DbObjectDao;
 import org.sbrf.dao.MemoryObjectDao;
 import org.sbrf.dao.ObjectDao;
@@ -25,6 +25,11 @@ public class EmployeeController {
     private static ObjectDao employeeDao;
 
     public static void createDao() {
+        if (employeeDao != null) {
+            logger.error("EmployeeController: попытка поменять тип хранилища.");
+            return;
+        }
+
         try {
             if (baseStoreType == StoreTypes.Database)
                 employeeDao = new DbObjectDao();
@@ -35,12 +40,13 @@ public class EmployeeController {
             exception.printStackTrace();
         }
     }
+
     @GetMapping({"/", ""})
     public String index(Model model) {
         try {
             List<Employee> employees = employeeDao.getAll();
             model.addAttribute("employees", employees);
-        } catch(GetAllObjectException exception) {
+        } catch (GetAllObjectException exception) {
             logger.error("EmployeeController in getAll error: " + exception.toString());
             exception.printStackTrace();
         }
@@ -53,7 +59,7 @@ public class EmployeeController {
         try {
             List<Employee> employees = employeeDao.getAll();
             model.addAttribute("employees", employees);
-        } catch(GetAllObjectException exception) {
+        } catch (GetAllObjectException exception) {
             logger.error("EmployeeController cannot shawall: " + exception.toString());
             exception.printStackTrace();
         }
@@ -166,7 +172,7 @@ public class EmployeeController {
         try {
             List<Employee> employees = employeeDao.getAll();
             model.addAttribute("employees", employees);
-        } catch(GetAllObjectException exception) {
+        } catch (GetAllObjectException exception) {
             exception.printStackTrace();
             logger.error("EmployeeController in delete getAll problem: " + exception.toString());
         }
