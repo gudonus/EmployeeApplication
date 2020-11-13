@@ -1,23 +1,31 @@
 package org.sbrf.dao;
 
+import java.util.HashMap;
+
 public class FilterDaoLong implements FilterDao<Long> {
 
-    private Long id;
+    private HashMap<String, String> values;
 
     public FilterDaoLong(Long id) {
-        this.id = id;
+        values = new HashMap<String, String>();
+        values.put("1", id.toString());
     }
 
     @Override
-    public String get(Long object) {
-        StringBuffer buffer = new StringBuffer("ID = ");
-        buffer.append(object);
-
-        return buffer.toString();
+    public String get() {
+//        StringBuffer buffer = new StringBuffer("ID = ");
+//        buffer.append(object);
+//
+//        return buffer.toString();
+        return null;
     }
 
     @Override
     public Long getId() {
-        return id;
+        return Long.parseLong(values.get("1"));
+    }
+
+    public void add(Long filter) {
+
     }
 }

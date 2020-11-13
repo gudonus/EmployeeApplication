@@ -1,5 +1,7 @@
 package org.sbrf.control;
 
+import org.sbrf.dao.DaoTypeController;
+import org.sbrf.dto.Employee;
 import org.sbrf.enums.StoreTypes;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,11 +20,9 @@ public class MainController {
     @GetMapping("/{storeTypeId}")
     public String indexStoreType(@PathVariable("storeTypeId") String storeTypeId) {
         if (storeTypeId.equals("1"))
-            EmployeeController.baseStoreType = StoreTypes.Database;
+            EmployeeController.createDao(StoreTypes.Database);
         else
-            EmployeeController.baseStoreType = StoreTypes.MemoryStore;
-
-        EmployeeController.createDao();
+            EmployeeController.createDao(StoreTypes.MemoryStore);
 
         return "employee";
     }

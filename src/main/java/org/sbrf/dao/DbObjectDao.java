@@ -4,16 +4,16 @@ import org.apache.log4j.Logger;
 import org.sbrf.db.DbConnectionManager;
 import org.sbrf.dto.Employee;
 import org.sbrf.dto.Function;
-import org.sbrf.exception.CannotAddObjectException;
-import org.sbrf.exception.CannotDeleteObjectException;
-import org.sbrf.exception.CannotUpdateObjectException;
-import org.sbrf.exception.GetAllFunctionObjectException;
+import org.sbrf.exception.AddObjectException;
+import org.sbrf.exception.DeleteObjectException;
+import org.sbrf.exception.GetObjectException;
+import org.sbrf.exception.UpdateObjectException;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DbObjectDao implements ObjectDao {
+public class DbObjectDao implements ObjectDao<Employee> {
 
     private final DbConnectionManager dbConnectionManager;
 
@@ -29,11 +29,11 @@ public class DbObjectDao implements ObjectDao {
     }
 
     @Override
-    public void add(Employee employee) throws CannotAddObjectException {
+    public void add(Employee employee) throws AddObjectException {
         Connection connection = dbConnectionManager.getConnection();
 
         if (!employee.isValid())
-            throw new CannotAddObjectException("DbObjectDao: Not all fields were completed!");
+            throw new AddObjectException("DbObjectDao: Not all fields were completed!");
 
         try {
             Long PersonDataId = createPersonData(employee);
@@ -48,21 +48,21 @@ public class DbObjectDao implements ObjectDao {
             preparedStatement.setString(5, String.valueOf(PersonDataId));
 
             if (preparedStatement.executeUpdate() != 1)
-                throw new CannotAddObjectException("DbObjectDao: Was not added employee in the DataBase!");
+                throw new AddObjectException("DbObjectDao: Was not added employee in the DataBase!");
 
             preparedStatement.close();
         } catch (Exception exception) {
             logger.error("\tDbObjectDao: update: On DB insert: " + exception.toString());
-            throw new CannotAddObjectException("DbObjectDao: Database exception during updating the employee! " + exception.toString());
+            throw new AddObjectException("DbObjectDao: Database exception during updating the employee! " + exception.toString());
         }
     }
 
     @Override
-    public void update(Employee employee) throws CannotUpdateObjectException {
+    public void update(Employee employee) throws UpdateObjectException {
         Connection connection = dbConnectionManager.getConnection();
 
         if (!employee.isValid())
-            throw new CannotUpdateObjectException("DbObjectDao: Not all fields were completed!");
+            throw new UpdateObjectException("DbObjectDao: Not all fields were completed!");
 
         try {
             Long PersonDataId = createPersonData(employee);
@@ -77,12 +77,12 @@ public class DbObjectDao implements ObjectDao {
             preparedStatement.setString(4, String.valueOf(PersonDataId));
 
             if (preparedStatement.executeUpdate() != 1)
-                throw new CannotUpdateObjectException("DbObjectDao: Was not updated employee into the DataBase!");
+                throw new UpdateObjectException("DbObjectDao: Was not updated employee into the DataBase!");
 
             preparedStatement.close();
         } catch (Exception exception) {
             logger.error("\tDbObjectDao: update: On DB insert: " + exception.toString());
-            throw new CannotUpdateObjectException("DbObjectDao: Database exception during updating the employee! " + exception.toString());
+            throw new UpdateObjectException("DbObjectDao: Database exception during updating the employee! " + exception.toString());
         }
     }
 
@@ -119,7 +119,7 @@ public class DbObjectDao implements ObjectDao {
     }
 
     @Override
-    public List<Function> getAllFunctions() throws GetAllFunctionObjectException {
+    public List<Function> getAllFunctions() throws GetObjectException {
         Connection connection = dbConnectionManager.getConnection();
 
         List<Function> functions = new ArrayList<>();
@@ -136,7 +136,7 @@ public class DbObjectDao implements ObjectDao {
             }
             statement.close();
         } catch (SQLException exception) {
-            throw new GetAllFunctionObjectException("DbObjectDao: getAll: " + exception.toString());
+            throw new GetObjectException("DbObjectDao: getAll: " + exception.toString());
         }
 
         return functions;
@@ -173,19 +173,19 @@ public class DbObjectDao implements ObjectDao {
     }
 
     @Override
-    public void delete(FilterDao filter) throws CannotDeleteObjectException {
+    public void delete(FilterDao filter) throws DeleteObjectException {
         Connection connection = dbConnectionManager.getConnection();
         try {
             String sqlQuery = "delete from Employees where id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setString(1, String.valueOf(filter.getId()));
             if (preparedStatement.executeUpdate() != 1)
-                throw new CannotDeleteObjectException("DbDao->delete: ИД не найден. ");
+                throw new DeleteObjectException("DbDao->delete: ИД не найден. ");
 
             preparedStatement.close();
         } catch (Exception exception) {
             logger.error("\tDbObjectDao: delete: On DB insert: " + exception.toString());
-            throw new CannotDeleteObjectException("DbObjectDao: delete: " + exception.getMessage());
+            throw new DeleteObjectException("DbObjectDao: delete: " + exception.getMessage());
         }
     }
 

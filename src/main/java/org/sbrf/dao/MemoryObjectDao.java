@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MemoryObjectDao implements ObjectDao {
+public class MemoryObjectDao implements ObjectDao<Employee> {
 
     private HashMap<Long, Employee> employees;
     private HashMap<Long, Function> functions;
@@ -26,35 +26,35 @@ public class MemoryObjectDao implements ObjectDao {
     }
 
     @Override
-    public void add(Employee employee) throws CannotAddObjectException {
+    public void add(Employee employee) throws AddObjectException {
         try {
             if (!employee.isValid())
-                throw new CannotAddObjectException("MemoryObjectDao: Not all fields were completed!");
+                throw new AddObjectException("MemoryObjectDao: Not all fields were completed!");
 
             employee.setId(employee.hashCode());
             employees.put(Long.valueOf(employee.getId()), employee);
         } catch(Exception exception) {
-            throw new CannotAddObjectException(exception.getMessage());
+            throw new AddObjectException(exception.getMessage());
         }
     }
 
     @Override
-    public List<Employee> getAll() throws GetAllObjectException {
+    public List<Employee> getAll() throws GetObjectException {
         try {
             List<Employee> allEmployees = new ArrayList<Employee>(this.employees.values());
             return allEmployees;
         } catch(Exception exception) {
-            throw new GetAllObjectException("MemoryObjectDao: getAll: " + exception.getMessage());
+            throw new GetObjectException("MemoryObjectDao: getAll: " + exception.getMessage());
         }
     }
 
     @Override
-    public List<Function> getAllFunctions() throws GetAllFunctionObjectException {
+    public List<Function> getAllFunctions() throws GetObjectException {
         try {
             List<Function> allFunctions = new ArrayList<Function>(functions.values());
             return allFunctions;
         } catch(Exception exception) {
-            throw new GetAllFunctionObjectException("MemoryObjectDao: getAllFunctions: " + exception.getMessage());
+            throw new GetObjectException("MemoryObjectDao: getAllFunctions: " + exception.getMessage());
         }
     }
 
@@ -64,21 +64,21 @@ public class MemoryObjectDao implements ObjectDao {
     }
 
     @Override
-    public void delete(FilterDao filter) throws CannotDeleteObjectException {
+    public void delete(FilterDao filter) throws DeleteObjectException {
         try {
             employees.remove(filter.getId());
         } catch(Exception exception) {
-            throw new CannotDeleteObjectException("MemoryObjectDao: delete: " + exception.getMessage());
+            throw new DeleteObjectException("MemoryObjectDao: delete: " + exception.getMessage());
         }
 
     }
 
     @Override
-    public void update(Employee employee) throws CannotUpdateObjectException {
+    public void update(Employee employee) throws UpdateObjectException {
         try {
             employees.replace(employee.getId(), employee);
         } catch(Exception exception) {
-            throw new CannotUpdateObjectException("MemoryObjectDao: Не удается обновить объект: " + exception.getMessage());
+            throw new UpdateObjectException("MemoryObjectDao: Не удается обновить объект: " + exception.getMessage());
         }
     }
 }

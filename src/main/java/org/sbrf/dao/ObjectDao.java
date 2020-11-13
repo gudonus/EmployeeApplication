@@ -6,6 +6,6 @@ import org.sbrf.exception.*;
 
 import java.util.List;
 
-public interface ObjectDao extends Dao<Employee> {
-    List<Function> getAllFunctions() throws GetAllFunctionObjectException;
+public interface ObjectDao<T extends Employee> extends Dao<Employee> {
+    List<Function> getAllFunctions() throws GetObjectException;
 }

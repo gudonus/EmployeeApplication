@@ -1,10 +1,7 @@
 package org.sbrf.control;
 
 import org.apache.log4j.Logger;
-import org.sbrf.dao.DbObjectDao;
-import org.sbrf.dao.FilterDaoLong;
-import org.sbrf.dao.MemoryObjectDao;
-import org.sbrf.dao.ObjectDao;
+import org.sbrf.dao.*;
 import org.sbrf.dto.Employee;
 import org.sbrf.dto.Function;
 import org.sbrf.enums.StoreTypes;
@@ -21,18 +18,19 @@ public class EmployeeController {
 
     private static final Logger logger = Logger.getLogger(EmployeeController.class);
 
-    public static StoreTypes baseStoreType;
+    public static DaoTypeController datastore;
 
     private static ObjectDao employeeDao;
 
-    public static void createDao() {
+    public static void createDao(StoreTypes dataStoreType) {
         if (employeeDao != null) {
             logger.error("EmployeeController: попытка поменять тип хранилища.");
             return;
         }
 
+        datastore = DaoTypeController.applyType(dataStoreType);
         try {
-            if (baseStoreType == StoreTypes.Database)
+            if (datastore.getType() == StoreTypes.Database)
                 employeeDao = new DbObjectDao();
             else
                 employeeDao = new MemoryObjectDao();
@@ -47,7 +45,7 @@ public class EmployeeController {
         try {
             List<Employee> employees = employeeDao.getAll();
             model.addAttribute("employees", employees);
-        } catch (GetAllObjectException exception) {
+        } catch (GetObjectException exception) {
             logger.error("EmployeeController in getAll error: " + exception.toString());
             exception.printStackTrace();
         }
@@ -60,7 +58,7 @@ public class EmployeeController {
         try {
             List<Employee> employees = employeeDao.getAll();
             model.addAttribute("employees", employees);
-        } catch (GetAllObjectException exception) {
+        } catch (GetObjectException exception) {
             logger.error("EmployeeController cannot shawall: " + exception.toString());
             exception.printStackTrace();
         }
@@ -75,7 +73,7 @@ public class EmployeeController {
         try {
             List<Function> functions = employeeDao.getAllFunctions();
             model.addAttribute("functions", functions);
-        } catch (GetAllFunctionObjectException exception) {
+        } catch (GetObjectException exception) {
             logger.error("EmployeeController cannot add: " + exception.toString());
             exception.printStackTrace();
         }
@@ -96,7 +94,7 @@ public class EmployeeController {
         try {
             List<Function> functions = employeeDao.getAllFunctions();
             model.addAttribute("functions", functions);
-        } catch (GetAllFunctionObjectException exception) {
+        } catch (GetObjectException exception) {
             logger.error("EmployeeController cannot update: " + exception.toString());
             exception.printStackTrace();
         }
@@ -109,7 +107,7 @@ public class EmployeeController {
         try {
             employeeDao.add(employee);
             wasAdded = "Was Added Successfully";
-        } catch (CannotAddObjectException exception) {
+        } catch (AddObjectException exception) {
             wasAdded = "Error adding employee: " + exception.toString();
             exception.printStackTrace();
         }
@@ -126,7 +124,7 @@ public class EmployeeController {
         try {
             employeeDao.update(employee);
             wasUpdated = "Was Added Successfully";
-        } catch (CannotUpdateObjectException exception) {
+        } catch (UpdateObjectException exception) {
             wasUpdated = "Error adding employee: " + exception.toString();
             exception.printStackTrace();
         }
@@ -147,7 +145,7 @@ public class EmployeeController {
 
         FilterDaoLong filter = new FilterDaoLong(Long.parseLong(employeeId));
         try {
-            Employee employee = employeeDao.get(filter);
+            Employee employee = (Employee) employeeDao.get(filter);
             model.addAttribute("id", employee.getId());
             model.addAttribute("firstName", employee.getFirstName());
             model.addAttribute("surName", employee.getSurName());
@@ -184,7 +182,7 @@ public class EmployeeController {
         try {
             FilterDaoLong filter = new FilterDaoLong(Long.parseLong(employeeId));
             employeeDao.delete(filter);
-        } catch (CannotDeleteObjectException exception) {
+        } catch (DeleteObjectException exception) {
             exception.printStackTrace();
             logger.error("EmployeeController cannot delete: " + exception.toString());
         }
@@ -193,7 +191,7 @@ public class EmployeeController {
         try {
             List<Employee> employees = employeeDao.getAll();
             model.addAttribute("employees", employees);
-        } catch (GetAllObjectException exception) {
+        } catch (GetObjectException exception) {
             exception.printStackTrace();
             logger.error("EmployeeController in delete getAll problem: " + exception.toString());
         }

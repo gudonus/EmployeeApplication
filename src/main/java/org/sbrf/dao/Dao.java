@@ -7,13 +7,13 @@ import java.util.List;
 // реализовать на основе мап - хранение в памяти
 public interface Dao<T> {
 
-    void add(T object) throws CannotAddObjectException;
+    void add(T object) throws AddObjectException;
 
-    List<T> getAll() throws GetAllObjectException;
+    List<T> getAll() throws GetObjectException;
 
     T get(FilterDao filter) throws NotFoundObjectException; // фильтр-интерфейс реализован для объекта ...
 
-    void delete(FilterDao filter) throws CannotDeleteObjectException;
+    void delete(FilterDao filter) throws DeleteObjectException;
 
-    void update(T object) throws CannotUpdateObjectException;
+    void update(T object) throws UpdateObjectException;
 }
