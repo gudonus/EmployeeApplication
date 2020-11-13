@@ -59,14 +59,14 @@ public class MemoryObjectDao implements ObjectDao {
     }
 
     @Override
-    public Employee get(long objectId) {
-        return employees.get(objectId);
+    public Employee get(FilterDao filter) {
+        return employees.get(filter.getId());
     }
 
     @Override
-    public void delete(long objectId) throws CannotDeleteObjectException {
+    public void delete(FilterDao filter) throws CannotDeleteObjectException {
         try {
-            employees.remove(objectId);
+            employees.remove(filter.getId());
         } catch(Exception exception) {
             throw new CannotDeleteObjectException("MemoryObjectDao: delete: " + exception.getMessage());
         }

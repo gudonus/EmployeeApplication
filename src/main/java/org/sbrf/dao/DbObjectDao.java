@@ -143,7 +143,7 @@ public class DbObjectDao implements ObjectDao {
     }
 
     @Override
-    public Employee get(long employeeId) {
+    public Employee get(FilterDao filter) {
         Connection connection = dbConnectionManager.getConnection();
 
         Employee employee = new Employee();
@@ -153,7 +153,7 @@ public class DbObjectDao implements ObjectDao {
                     " from Employees emp\n" +
                     " left join Functions func on func.ID = emp.FunctionID\n" +
                     " left join PersonDatas pd on pd.ID = emp.PersonDataID\n" +
-                    " where emp.ID = " + employeeId;
+                    " where emp.ID = " + filter.getId();
             ResultSet employeeSet = statement.executeQuery(sqlQuery);
 
             while (employeeSet.next()) {
@@ -173,12 +173,12 @@ public class DbObjectDao implements ObjectDao {
     }
 
     @Override
-    public void delete(long employeeId) throws CannotDeleteObjectException {
+    public void delete(FilterDao filter) throws CannotDeleteObjectException {
         Connection connection = dbConnectionManager.getConnection();
         try {
             String sqlQuery = "delete from Employees where id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
-            preparedStatement.setString(1, String.valueOf(employeeId));
+            preparedStatement.setString(1, String.valueOf(filter.getId()));
             if (preparedStatement.executeUpdate() != 1)
                 throw new CannotDeleteObjectException("DbDao->delete: ИД не найден. ");
 

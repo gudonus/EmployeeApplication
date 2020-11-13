@@ -1,12 +1,13 @@
 package org.sbrf.control;
 
 import org.apache.log4j.Logger;
-import org.sbrf.enums.StoreTypes;
 import org.sbrf.dao.DbObjectDao;
+import org.sbrf.dao.FilterDaoLong;
 import org.sbrf.dao.MemoryObjectDao;
 import org.sbrf.dao.ObjectDao;
 import org.sbrf.dto.Employee;
 import org.sbrf.dto.Function;
+import org.sbrf.enums.StoreTypes;
 import org.sbrf.exception.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -83,7 +84,14 @@ public class EmployeeController {
 
     @GetMapping("/update/{employeeId}")
     public String update(@PathVariable("employeeId") String employeeId, Model model) {
-        model.addAttribute("employee", employeeDao.get(Long.parseLong(employeeId)));
+        FilterDaoLong filter = new FilterDaoLong(Long.parseLong(employeeId));
+        try {
+            model.addAttribute("employee", employeeDao.get(filter));
+        } catch (Exception exception) {
+//            new NotFoundObjectException("EmployeeController: update: " + exception.getMessage());
+            logger.error("EmployeeController cannot update: " + exception.toString());
+            exception.printStackTrace();
+        }
 
         try {
             List<Function> functions = employeeDao.getAllFunctions();
@@ -136,13 +144,19 @@ public class EmployeeController {
 
     @GetMapping("/show/{employeeId}")
     public String show(@PathVariable("employeeId") String employeeId, Model model) {
-        Employee employee = employeeDao.get(Integer.parseInt(employeeId));
 
-        model.addAttribute("id", employee.getId());
-        model.addAttribute("firstName", employee.getFirstName());
-        model.addAttribute("surName", employee.getSurName());
-        model.addAttribute("address", employee.getAddress());
-        model.addAttribute("phone", employee.getPhone());
+        FilterDaoLong filter = new FilterDaoLong(Long.parseLong(employeeId));
+        try {
+            Employee employee = employeeDao.get(filter);
+            model.addAttribute("id", employee.getId());
+            model.addAttribute("firstName", employee.getFirstName());
+            model.addAttribute("surName", employee.getSurName());
+            model.addAttribute("address", employee.getAddress());
+            model.addAttribute("phone", employee.getPhone());
+        } catch(Exception exception) {
+            logger.error("EmployeeController: show employee: " + exception.getMessage());
+            exception.printStackTrace();
+        }
 
         return "show_employee";
     }
@@ -162,7 +176,8 @@ public class EmployeeController {
     @GetMapping("/delete/{employeeId}")
     public String deleteEmployee(@PathVariable("employeeId") String employeeId, Model model) {
         try {
-            employeeDao.delete(Integer.parseInt(employeeId));
+            FilterDaoLong filter = new FilterDaoLong(Long.parseLong(employeeId));
+            employeeDao.delete(filter);
         } catch (CannotDeleteObjectException exception) {
             exception.printStackTrace();
             logger.error("EmployeeController cannot delete: " + exception.toString());

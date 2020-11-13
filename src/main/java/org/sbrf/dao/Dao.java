@@ -1,9 +1,6 @@
 package org.sbrf.dao;
 
-import org.sbrf.exception.CannotAddObjectException;
-import org.sbrf.exception.CannotDeleteObjectException;
-import org.sbrf.exception.CannotUpdateObjectException;
-import org.sbrf.exception.GetAllObjectException;
+import org.sbrf.exception.*;
 
 import java.util.List;
 
@@ -13,9 +10,10 @@ public interface Dao<T> {
     void add(T object) throws CannotAddObjectException;
 
     List<T> getAll() throws GetAllObjectException;
-    T get(long objectId); // фильтр-интерфейс реализован для объекта ...
 
-    void delete(long objectId) throws CannotDeleteObjectException;
+    T get(FilterDao filter) throws NotFoundObjectException; // фильтр-интерфейс реализован для объекта ...
+
+    void delete(FilterDao filter) throws CannotDeleteObjectException;
 
     void update(T object) throws CannotUpdateObjectException;
 }
