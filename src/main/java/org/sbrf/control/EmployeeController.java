@@ -117,7 +117,7 @@ public class EmployeeController {
         model.addAttribute("wasAddedResult", wasAdded);
         logger.info("\t addEmployee: " + wasAdded);
 
-        return "add_employee";
+        return "result";
     }
 
     @PostMapping("/update")
@@ -153,12 +153,18 @@ public class EmployeeController {
             model.addAttribute("surName", employee.getSurName());
             model.addAttribute("address", employee.getAddress());
             model.addAttribute("phone", employee.getPhone());
+
+            if (employee.isValid())
+                return "show_employee";
         } catch(Exception exception) {
             logger.error("EmployeeController: show employee: " + exception.getMessage());
             exception.printStackTrace();
+
+            model.addAttribute("wasAddedResult", "Employee not found!");
+            return "result";
         }
 
-        return "show_employee";
+        return "showall";
     }
 
     @GetMapping("/delete")
