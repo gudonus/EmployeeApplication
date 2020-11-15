@@ -25,6 +25,7 @@
         <spring.version>5.2.10.RELEASE</spring.version>
         <jetty.version>9.4.33.v20201020</jetty.version>
         <thymeleaf-version>3.0.11.RELEASE</thymeleaf-version>
+        <hibernate-version>5.4.10.Final</hibernate-version>
     </properties>
 
     <dependencies>
@@ -62,13 +63,6 @@
             <version>${jetty.version}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>javax.servlet</groupId>-->
-<!--            <artifactId>javax.servlet-api</artifactId>-->
-<!--            <version>4.0.1</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
-
         <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
@@ -85,6 +79,17 @@
             <artifactId>h2</artifactId>
             <version>1.4.200</version>
 <!--            <scope>test</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.4.10.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate-version}</version>
         </dependency>
 
     </dependencies>

@@ -38,7 +38,7 @@ public class DbObjectDao implements ObjectDao<Employee> {
         try {
             Long PersonDataId = createPersonData(employee);
 
-            String sqlQuery = "insert into Employees(ID, FirstName, SurName, StartDate, EndDate, FireDate, FunctionID, PersonDataID) " +
+            String sqlQuery = "insert into Employees(EmployeeID, FirstName, SurName, StartDate, EndDate, FireDate, FunctionID, PersonDataID) " +
                     "values (?, ?, ?, sysdate, null, null, ?, ?);";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setString(1, String.valueOf(employee.hashCode()));
@@ -53,14 +53,13 @@ public class DbObjectDao implements ObjectDao<Employee> {
             preparedStatement.close();
         } catch (Exception exception) {
             logger.error("\tDbObjectDao: update: On DB insert: " + exception.toString());
-            throw new AddObjectException("DbObjectDao: Database exception during updating the employee! " + exception.toString());
+            throw new AddObjectException("DbObjectDao: Database exception during adding the employee! " + exception.toString());
         }
     }
 
     @Override
     public void update(Employee employee) throws UpdateObjectException {
         Connection connection = dbConnectionManager.getConnection();
-
         if (!employee.isValid())
             throw new UpdateObjectException("DbObjectDao: Not all fields were completed!");
 
@@ -69,7 +68,7 @@ public class DbObjectDao implements ObjectDao<Employee> {
 
             String sqlQuery =
                     "update Employees SET FirstName = ?, SurName = ?, FunctionID = ?, PersonDataID = ?" +
-                    "where ID = " + String.valueOf(employee.getId());
+                            "where EmployeeID = " + employee.getId();
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setString(1, employee.getFirstName());
             preparedStatement.setString(2, employee.getSurName());
@@ -93,7 +92,7 @@ public class DbObjectDao implements ObjectDao<Employee> {
         Connection connection = dbConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
-            String sqlQuery = "select emp.ID, emp.FirstName, emp.SurName, func.Name as function, pd.Address, pd.Phone\n" +
+            String sqlQuery = "select emp.EmployeeID, emp.FirstName, emp.SurName, func.Name as function, pd.Address, pd.Phone\n" +
                     " from Employees emp\n" +
                     " left join Functions func on func.ID = emp.FunctionID\n" +
                     " left join PersonDatas pd on pd.ID = emp.PersonDataID\n";
@@ -101,14 +100,9 @@ public class DbObjectDao implements ObjectDao<Employee> {
 
             while (employeeSet.next()) {
                 Employee employee = new Employee();
-                employee.setId(Integer.parseInt(employeeSet.getString("id")));
-                employee.setFirstName(employeeSet.getString("firstName"));
-                employee.setSurName(employeeSet.getString("surName"));
-                employee.setFunction(employeeSet.getString("function"));
-                employee.setAddress(employeeSet.getString("address"));
-                employee.setPhone(employeeSet.getString("phone"));
-                employees.add(employee);
+                setEmployeeData(employee, employeeSet);
 
+                employees.add(employee);
             }
             statement.close();
         } catch (Exception exception) {
@@ -149,20 +143,15 @@ public class DbObjectDao implements ObjectDao<Employee> {
         Employee employee = new Employee();
         try {
             Statement statement = connection.createStatement();
-            String sqlQuery = "select emp.ID, emp.FirstName, emp.SurName, func.ID as function, pd.Address, pd.Phone\n" +
+            String sqlQuery = "select emp.EmployeeID, emp.FirstName, emp.SurName, func.ID as function, pd.Address, pd.Phone\n" +
                     " from Employees emp\n" +
                     " left join Functions func on func.ID = emp.FunctionID\n" +
                     " left join PersonDatas pd on pd.ID = emp.PersonDataID\n" +
-                    " where emp.ID = " + filter.getId();
+                    " where " + filter.getValidCondition();//getValue("employeeId");
             ResultSet employeeSet = statement.executeQuery(sqlQuery);
 
             while (employeeSet.next()) {
-                employee.setId(Integer.parseInt(employeeSet.getString("id")));
-                employee.setFirstName(employeeSet.getString("firstName"));
-                employee.setSurName(employeeSet.getString("surName"));
-                employee.setFunction(employeeSet.getString("function"));
-                employee.setAddress(employeeSet.getString("address"));
-                employee.setPhone(employeeSet.getString("phone"));
+                setEmployeeData(employee, employeeSet);
             }
             statement.close();
         } catch (Exception exception) {
@@ -176,9 +165,9 @@ public class DbObjectDao implements ObjectDao<Employee> {
     public void delete(FilterDao filter) throws DeleteObjectException {
         Connection connection = dbConnectionManager.getConnection();
         try {
-            String sqlQuery = "delete from Employees where id = ?";
+            String sqlQuery = "delete from Employees where EmployeeId = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
-            preparedStatement.setString(1, String.valueOf(filter.getId()));
+            preparedStatement.setString(1, String.valueOf(filter.getValue("employeeId")));
             if (preparedStatement.executeUpdate() != 1)
                 throw new DeleteObjectException("DbDao->delete: ИД не найден. ");
 
@@ -195,7 +184,7 @@ public class DbObjectDao implements ObjectDao<Employee> {
         long PersonDataId = employee.hashCode();
         try {
 
-            String sqlQuery = "insert into PersonDatas(ID, EmployeeID, DataDate, Phone, Address) " +
+            String sqlQuery = "insert into PersonDatas(ID, EmpID, DataDate, Phone, Address) " +
                     "values (?, ?, sysdate, ?, ?);";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, String.valueOf(PersonDataId));
@@ -212,5 +201,14 @@ public class DbObjectDao implements ObjectDao<Employee> {
         }
 
         return PersonDataId;
+    }
+
+    private void setEmployeeData(Employee employee, ResultSet employeeSet) throws SQLException {
+        employee.setId(Integer.parseInt(employeeSet.getString("employeeId")));
+        employee.setFirstName(employeeSet.getString("firstName"));
+        employee.setSurName(employeeSet.getString("surName"));
+        employee.setFunction(employeeSet.getString("function"));
+        employee.setAddress(employeeSet.getString("address"));
+        employee.setPhone(employeeSet.getString("phone"));
     }
 }

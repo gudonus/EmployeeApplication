@@ -47,14 +47,6 @@ public class Employee implements Serializable {
         this.phone = phone;
     }
 
-//    public Employee() {
-//    }
-//
-//    public Employee(String firstName, String surName) {
-//        this.firstName = firstName;
-//        this.surName = surName;
-//    }
-
     public long getId() {
         return id;
     }

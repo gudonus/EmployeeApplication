@@ -1,7 +1,9 @@
 package org.sbrf.dao;
 
 public interface FilterDao<T> {
-    T getId();
+    T getValue(String key);
 
-    String get();
+    String getKeyCondition(String key);
+
+    String getValidCondition();
 }

@@ -6,10 +6,16 @@
 </head>
 <body link="yellow" vlink="#00008b" alink="#ffd700" bgcolor="#87cefa">
     <H1> SHOW PAGE </H1>
-    <H3> Need to set employee ID... </H3>
-    <br/>
+    <H3> Need to set employee condition... </H3>
+    <br/> Surname <br/>
+    <input type="text" id="employeeSurName" name="employeeSurName" placeholder="SurName">
+    <button type="button" onclick="window.location.href = '/employee/show?surname=\'' + document.getElementById('employeeSurName').value + '\''">Find By SurName </button>
+    <br/> ID <br/>
     <input type="text" id="employeeId" name="employeeId" placeholder="1">
-    <button type="button" onclick="window.location.href = '/employee/show/' + document.getElementById('employeeId').value + '/'">Show Employee </button>
+    <button type="button" onclick="window.location.href = '/employee/show?id=' + document.getElementById('employeeId').value">Find By ID </button>
+    <br/> Phone <br/>
+    <input type="text" id="employeePhone" name="employeePhone" placeholder="89215550192">
+    <button type="button" onclick="window.location.href = '/employee/show?phone=' + document.getElementById('employeePhone').value">Find By Phone </button>
     <br/>
     <a href="/employee/"><H4> Go Back To Menu Page </H4></a>
 

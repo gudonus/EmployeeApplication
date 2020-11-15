@@ -185,7 +185,7 @@
     <table id="166" parent="4" name="PERSONDATAS">
       <ObjectId>5</ObjectId>
     </table>
-    <column id="167" parent="164" name="ID">
+    <column id="167" parent="164" name="EMPLOYEEID">
       <Position>1</Position>
       <DataType>NUMBER|0s</DataType>
     </column>
@@ -229,7 +229,7 @@
       <Position>1</Position>
       <DataType>NUMBER|0s</DataType>
     </column>
-    <column id="178" parent="166" name="EMPLOYEEID">
+    <column id="178" parent="166" name="EMPID">
       <Position>2</Position>
       <DataType>NUMBER|0s</DataType>
     </column>

@@ -10,19 +10,20 @@ import java.util.List;
 
 public class MemoryObjectDao implements ObjectDao<Employee> {
 
-    private HashMap<Long, Employee> employees;
+    private HashMap<String, Employee> employees;
     private HashMap<Long, Function> functions;
 
     public MemoryObjectDao() {
-        employees = new HashMap<Long, Employee>();
+        employees = new HashMap<String, Employee>();
         functions = new HashMap<Long, Function>();
 
-        functions.put(Long.valueOf(1), new Function(1, "Engineer"));
-        functions.put(Long.valueOf(2), new Function(2, "Main Engineer"));
-        functions.put(Long.valueOf(3), new Function(3, "Analytic"));
-        functions.put(Long.valueOf(4), new Function(4, "DevOps Engineer"));
-        functions.put(Long.valueOf(5), new Function(5, "Tester"));
-        functions.put(Long.valueOf(6), new Function(6, "Main Tester"));
+        int functionId = 1;
+        functions.put(Long.valueOf(1), new Function(functionId, "Engineer"));
+        functions.put(Long.valueOf(2), new Function(functionId++, "Main Engineer"));
+        functions.put(Long.valueOf(3), new Function(functionId++, "Analytic"));
+        functions.put(Long.valueOf(4), new Function(functionId++, "DevOps Engineer"));
+        functions.put(Long.valueOf(5), new Function(functionId++, "Tester"));
+        functions.put(Long.valueOf(6), new Function(functionId++, "Main Tester"));
     }
 
     @Override
@@ -32,7 +33,7 @@ public class MemoryObjectDao implements ObjectDao<Employee> {
                 throw new AddObjectException("MemoryObjectDao: Not all fields were completed!");
 
             employee.setId(employee.hashCode());
-            employees.put(Long.valueOf(employee.getId()), employee);
+            employees.put(String.valueOf(employee.getId()), employee);
         } catch(Exception exception) {
             throw new AddObjectException(exception.getMessage());
         }
@@ -60,13 +61,13 @@ public class MemoryObjectDao implements ObjectDao<Employee> {
 
     @Override
     public Employee get(FilterDao filter) {
-        return employees.get(filter.getId());
+        return employees.get(filter.getValue("employeeId"));
     }
 
     @Override
     public void delete(FilterDao filter) throws DeleteObjectException {
         try {
-            employees.remove(filter.getId());
+            employees.remove(filter.getValue("employeeId"));
         } catch(Exception exception) {
             throw new DeleteObjectException("MemoryObjectDao: delete: " + exception.getMessage());
         }
@@ -76,7 +77,7 @@ public class MemoryObjectDao implements ObjectDao<Employee> {
     @Override
     public void update(Employee employee) throws UpdateObjectException {
         try {
-            employees.replace(employee.getId(), employee);
+            employees.replace(String.valueOf(employee.getId()), employee);
         } catch(Exception exception) {
             throw new UpdateObjectException("MemoryObjectDao: Не удается обновить объект: " + exception.getMessage());
         }

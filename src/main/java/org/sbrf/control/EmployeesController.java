@@ -5,7 +5,10 @@ import org.sbrf.dao.*;
 import org.sbrf.dto.Employee;
 import org.sbrf.dto.Function;
 import org.sbrf.enums.StoreTypes;
-import org.sbrf.exception.*;
+import org.sbrf.exception.AddObjectException;
+import org.sbrf.exception.DeleteObjectException;
+import org.sbrf.exception.GetObjectException;
+import org.sbrf.exception.UpdateObjectException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +17,9 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/employee")
-public class EmployeeController {
+public class EmployeesController {
 
-    private static final Logger logger = Logger.getLogger(EmployeeController.class);
+    private static final Logger logger = Logger.getLogger(EmployeesController.class);
 
     public static DaoTypeController datastore;
 
@@ -82,11 +85,10 @@ public class EmployeeController {
 
     @GetMapping("/update/{employeeId}")
     public String update(@PathVariable("employeeId") String employeeId, Model model) {
-        FilterDaoLong filter = new FilterDaoLong(Long.parseLong(employeeId));
+        FilterDaoEmployee filter = new FilterDaoEmployee("employeeId", employeeId);
         try {
             model.addAttribute("employee", employeeDao.get(filter));
         } catch (Exception exception) {
-//            new NotFoundObjectException("EmployeeController: update: " + exception.getMessage());
             logger.error("EmployeeController cannot update: " + exception.toString());
             exception.printStackTrace();
         }
@@ -123,9 +125,9 @@ public class EmployeeController {
         String wasUpdated;
         try {
             employeeDao.update(employee);
-            wasUpdated = "Was Added Successfully";
+            wasUpdated = "Was Updated Successfully";
         } catch (UpdateObjectException exception) {
-            wasUpdated = "Error adding employee: " + exception.toString();
+            wasUpdated = "Error updating employee: " + exception.toString();
             exception.printStackTrace();
         }
 
@@ -135,15 +137,23 @@ public class EmployeeController {
         return "update_employee";
     }
 
-    @GetMapping("/show")
+/*    @GetMapping("/show")
     public String show() {
         return "show";
-    }
+    }*/
 
-    @GetMapping("/show/{employeeId}")
-    public String show(@PathVariable("employeeId") String employeeId, Model model) {
+    @GetMapping("/show")
+    public String show(@RequestParam(name = "surname", required = false) String surname,
+                       @RequestParam(name = "id", required = false) String id,
+                       @RequestParam(name = "phone", required = false) String phone,
+                       Model model) {
 
-        FilterDaoLong filter = new FilterDaoLong(Long.parseLong(employeeId));
+        if ((surname == null) && (id == null) && (phone == null))
+            return "show";
+
+        FilterDaoEmployee filter = new FilterDaoEmployee("surname", surname);
+        filter.add("employeeId", id);
+        filter.add("phone", phone);
         try {
             Employee employee = (Employee) employeeDao.get(filter);
             model.addAttribute("id", employee.getId());
@@ -154,7 +164,8 @@ public class EmployeeController {
 
             if (employee.isValid())
                 return "show_employee";
-        } catch(Exception exception) {
+
+        } catch (Exception exception) {
             logger.error("EmployeeController: show employee: " + exception.getMessage());
             exception.printStackTrace();
 
@@ -180,7 +191,7 @@ public class EmployeeController {
     @GetMapping("/delete/{employeeId}")
     public String deleteEmployee(@PathVariable("employeeId") String employeeId, Model model) {
         try {
-            FilterDaoLong filter = new FilterDaoLong(Long.parseLong(employeeId));
+            FilterDaoEmployee filter = new FilterDaoEmployee("employeeId", employeeId);
             employeeDao.delete(filter);
         } catch (DeleteObjectException exception) {
             exception.printStackTrace();
